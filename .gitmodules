@@ -1,3 +1,3 @@
-[submodule "test_function"]
-	path = test_function
-	url = https://github.com/ntacoffee/optimization_test_function
+[submodule "test_functions"]
+	path = test_functions
+	url = https://github.com/ntacoffee/optimization_test_functions
