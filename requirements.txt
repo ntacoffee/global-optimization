@@ -1,1 +1,1 @@
--r test_functions/requirements.txt
+-e git+https://github.com/ntacoffee/optimization_test_functions#egg=opttfunc
