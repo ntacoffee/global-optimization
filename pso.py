@@ -3,6 +3,7 @@
 
 import numpy as np
 import plotly.graph_objects as go
+import plotly.io as pio
 from opttfunc import Eggholder
 
 n_particles = 500
@@ -54,24 +55,23 @@ def pso():
             )
         )
         if i_step in [0, 1, 9, 99, 999]:
-            plot_current_particles(x)
+            save_fig_current_particles(x, "particles_at_step_{}.png".format(i_step))
 
         # generate random value for update
         r_1 = np.random.rand(n_particles, 1)
         r_2 = np.random.rand(n_particles, 1)
 
         # compute next x, v
-        x_next = np.clip(x + v, x_lb, x_ub)
-        v_next = np.clip(
-            w * v + c_1 * r_1 * (x_hat - x) + c_2 * r_2 * (x_hat_g - x), x_lb, x_ub
-        )
+        x_next = x + v
+        v_next = w * v + c_1 * r_1 * (x_hat - x) + c_2 * r_2 * (x_hat_g - x)
 
         # update
-        x = x_next
+        x = np.clip(x_next, x_lb, x_ub)
         v = v_next
+        v[x != x_next] = 0
 
 
-def plot_current_particles(x: np.ndarray):
+def save_fig_current_particles(x: np.ndarray, filename: str):
 
     n_grid = 500
 
@@ -83,7 +83,14 @@ def plot_current_particles(x: np.ndarray):
             [np.reshape(xx_plot, (-1, 1)), np.reshape(yy_plot, (-1, 1))], axis=1
         )
     ).reshape((n_grid, n_grid))
-    contour1 = go.Contour(z=z_plot, x=x_plot, y=y_plot, colorscale="gray", opacity=0.2)
+    contour1 = go.Contour(
+        z=z_plot,
+        x=x_plot,
+        y=y_plot,
+        colorscale="gray",
+        opacity=0.5,
+        contours=dict(start=-1000, end=1000, size=200),
+    )
 
     x_plot = np.linspace(x_lb[0], x_ub[0], n_grid)
     y_plot = np.linspace(x_lb[1], x_ub[1], n_grid)
@@ -93,7 +100,14 @@ def plot_current_particles(x: np.ndarray):
             [np.reshape(xx_plot, (-1, 1)), np.reshape(yy_plot, (-1, 1))], axis=1
         )
     ).reshape((n_grid, n_grid))
-    contour2 = go.Contour(z=z_plot, x=x_plot, y=y_plot, colorscale="gray", opacity=1.0)
+    contour2 = go.Contour(
+        z=z_plot,
+        x=x_plot,
+        y=y_plot,
+        colorscale="gray",
+        opacity=1.0,
+        contours=dict(start=-1000, end=1000, size=200),
+    )
 
     fig = go.Figure(
         data=[
@@ -111,10 +125,14 @@ def plot_current_particles(x: np.ndarray):
             ),
             contour1,
             contour2,
-        ]
+        ],
+        layout=dict(showlegend=False),
     )
-    fig.update_layout()
-    fig.show()
+    fig.update_xaxes(range=(x_lb[0] * 1.2, x_ub[0] * 1.2))
+    fig.update_yaxes(range=(x_lb[1] * 1.2, x_ub[1] * 1.2))
+    fig.update_layout(width=600, height=600)
+
+    pio.write_image(fig, filename, scale=2)
 
 
 if __name__ == "__main__":
