@@ -1,1 +1,8 @@
+kaleido==0.2.1
+numpy==1.20.3
 -e git+https://github.com/ntacoffee/optimization_test_functions#egg=opttfunc
+overrides==6.1.0
+plotly==5.0.0
+six==1.16.0
+tenacity==7.0.0
+typing-utils==0.1.0
